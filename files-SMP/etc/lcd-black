@@ -1,0 +1,12 @@
+#!/bin/bash
+cp -r /etc/lcd4linux.conf.black /etc/lcd4linux.conf
+chmod 600 /etc/lcd4linux.conf
+/etc/init.d/lcd4linux restart
+echo
+echo .........................................................................
+echo Zrobione!
+echo Done!
+echo .........................................................................
+
+exit 0
+

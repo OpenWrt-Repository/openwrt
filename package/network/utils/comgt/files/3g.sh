@@ -53,25 +53,25 @@ proto_3g_setup() {
 				case "$service" in
 					umts_only) CODE=2;;
 					gprs_only) CODE=1;;
-					*) CODE=0;;
+					umts) CODE=0;;
 				esac
-				export MODE="AT\$NWRAT=${CODE},2"
+				[ -n "$CODE" ] && export MODE="AT\$NWRAT=${CODE},2"
 			elif echo "$cardinfo" | grep -q Option; then
 				case "$service" in
 					umts_only) CODE=1;;
 					gprs_only) CODE=0;;
-					*) CODE=3;;
+					umts) CODE=3;;
 				esac
-				export MODE="AT_OPSYS=${CODE}"
+				[ -n "$CODE" ] && export MODE="AT_OPSYS=${CODE}"
 			elif echo "$cardinfo" | grep -q "Sierra Wireless"; then
 				SIERRA=1
 			elif echo "$cardinfo" | grep -qi huawei; then
 				case "$service" in
 					umts_only) CODE="14,2";;
 					gprs_only) CODE="13,1";;
-					*) CODE="2,2";;
+					umts) CODE="2,2";;
 				esac
-				export MODE="AT^SYSCFG=${CODE},3FFFFFFF,2,4"
+				[ -n "$CODE" ] && export MODE="AT^SYSCFG=${CODE},3FFFFFFF,2,4"
 			fi
 
 			if [ -n "$pincode" ]; then

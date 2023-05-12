@@ -1,0 +1,44 @@
+From a17b0064b794285def5243dc5ab34638b3fc9fc7 Mon Sep 17 00:00:00 2001
+From: Jonas Albrecht <plonkbong100@protonmail.com>
+Date: Sat, 10 Oct 2020 00:11:28 +0000
+Subject: [PATCH] lantiq: xrx200_legacy; undef SW_ROUTING
+
+In the past SW_ROUTING was disable, because it forward broadcast frames
+to all ports.
+see:
+https://forum.openwrt.org/t/tp-link-td-w8970-td-w8980-td-w9980-disable-sw-
+routing-kernel-patch/75936
+Here the original commit:
+https://github.com/grobian/openwrt/commit/
+2c1b37d91f973568f2f1e109e15efbf973f684d7
+Discriptio from this commit:
+"
+lantiq: disable SW_ROUTING to fix switch acting like semi-hub
+
+The SW_ROUTING code tries to forward broadcast frames to all ports for
+some reason.  For instance IPv6 router announcements are done like this
+and hence end up on all switch ports, with the associated problems as
+result.
+"
+
+Signed-off-by: Jonas Albrecht <plonkbong100@protonmail.com>
+---
+ drivers/net/ethernet/lantiq_xrx200_legacy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/lantiq_xrx200_legacy.c b/drivers/net/ethernet/lantiq_xrx200_legacy.c
+index 2fe6257..180ac22 100644
+--- a/drivers/net/ethernet/lantiq_xrx200_legacy.c
++++ b/drivers/net/ethernet/lantiq_xrx200_legacy.c
+@@ -37,7 +37,7 @@
+ #include "lantiq_xrx200_legacy.h"
+ 
+ #define SW_POLLING
+-#define SW_ROUTING
++#undef SW_ROUTING
+ 
+ #ifdef SW_ROUTING
+ #define XRX200_MAX_DEV		1
+-- 
+2.7.4
+

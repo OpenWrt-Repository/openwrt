@@ -1,0 +1,3 @@
+@reboot /etc/red-led-off
+@reboot /etc/init.d/adblock start &
+*/30 * * * * /etc/speed

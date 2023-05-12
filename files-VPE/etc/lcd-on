@@ -1,0 +1,5 @@
+#!/bin/bash
+/etc/init.d/lcd4linux restart
+echo '1' >>/sys/class/backlight/fb_ili9341_eb904/bl_power
+exit 0
+

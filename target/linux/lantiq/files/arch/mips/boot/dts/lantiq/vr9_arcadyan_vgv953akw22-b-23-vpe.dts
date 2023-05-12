@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/dts-v1/;
+
+#include "vr9_arcadyan_vgv953akw22-b-23.dtsi"
+
+/ {
+	compatible = "arcadyan,vgv953akw22-b-23-vpe", "arcadyan,vgv953akw22-b-23", "arcadyan,vgv953akw22", "lantiq,xway", "lantiq,vr9";
+	model = "Telekom Speedport W 921v";
+	
+	chosen {
+		bootargs = "console=ttyLTQ0,115200 mem=116M phym=128M vpe1_load_addr=0x87e00000 vpe1_mem=2M maxvpes=1 maxtcs=1 nosmp";
+	};
+};
+
+&vmmc {
+        status = "okay";
+        gpios = <&gpio 30 GPIO_ACTIVE_HIGH  //fxs relay
+                         &gpio 31 GPIO_ACTIVE_HIGH   //still unknown
+                         &gpio 37 GPIO_ACTIVE_HIGH   // from eb904x (reset slic)
+                         &gpio 3  GPIO_ACTIVE_HIGH>; //reset_slic?
+};
+

@@ -351,7 +351,7 @@ rtl8367b_mib_counters[RTL8367B_NUM_MIB_COUNTERS] = {
 			return err;					\
 	} while (0)
 
-static const struct rtl8367b_initval rtl8367r_vb_initvals_0[] = {
+static const struct rtl8367b_initval rtl8367rb_initvals[] = {
 	{0x1B03, 0x0876}, {0x1200, 0x7FC4}, {0x0301, 0x0026}, {0x1722, 0x0E14},
 	{0x205F, 0x0002}, {0x2059, 0x1A00}, {0x205F, 0x0000}, {0x207F, 0x0002},
 	{0x2077, 0x0000}, {0x2078, 0x0000}, {0x2079, 0x0000}, {0x207A, 0x0000},
@@ -561,10 +561,10 @@ static const struct rtl8367b_initval rtl8367r_vb_initvals_0[] = {
 	{0x2206, 0x66E0}, {0x2206, 0x8E70}, {0x2206, 0xE076}, {0x2205, 0xE142},
 	{0x2206, 0x0701}, {0x2205, 0xE140}, {0x2206, 0x0405}, {0x220F, 0x0000},
 	{0x221F, 0x0000}, {0x2200, 0x1340}, {0x133E, 0x000E}, {0x133F, 0x0010},
-	{0x13EB, 0x11BB}
+	{0x13EB, 0x11BB}, {0x13E0, 0x0010}
 };
 
-static const struct rtl8367b_initval rtl8367r_vb_initvals_1[] = {
+static const struct rtl8367b_initval rtl8367r_vb_initvals[] = {
 	{0x1B03, 0x0876}, {0x1200, 0x7FC4}, {0x1305, 0xC000}, {0x121E, 0x03CA},
 	{0x1233, 0x0352}, {0x1234, 0x0064}, {0x1237, 0x0096}, {0x1238, 0x0078},
 	{0x1239, 0x0084}, {0x123A, 0x0030}, {0x205F, 0x0002}, {0x2059, 0x1A00},
@@ -602,7 +602,7 @@ static const struct rtl8367b_initval rtl8367r_vb_initvals_1[] = {
 	{0x2206, 0x0405}, {0x220F, 0x0000}, {0x221F, 0x0000}, {0x133E, 0x000E},
 	{0x133F, 0x0010}, {0x13EB, 0x11BB}, {0x207F, 0x0002}, {0x2073, 0x1D22},
 	{0x207F, 0x0000}, {0x133F, 0x0030}, {0x133E, 0x000E}, {0x2200, 0x1340},
-	{0x133E, 0x000E}, {0x133F, 0x0010},
+	{0x133E, 0x000E}, {0x133F, 0x0010}, {0x13E0, 0x0010}
 };
 
 static int rtl8367b_write_initvals(struct rtl8366_smi *smi,
@@ -716,31 +716,22 @@ static int rtl8367b_write_phy_reg(struct rtl8366_smi *smi,
 static int rtl8367b_init_regs(struct rtl8366_smi *smi)
 {
 	const struct rtl8367b_initval *initvals;
-	u32 chip_ver;
-	u32 rlvid;
 	int count;
-	int err;
 
-	REG_WR(smi, RTL8367B_RTL_MAGIC_ID_REG, RTL8367B_RTL_MAGIC_ID_VAL);
-	REG_RD(smi, RTL8367B_CHIP_VER_REG, &chip_ver);
+	switch (smi->chip_ver) {
+		case 0x1000:
+			initvals = rtl8367rb_initvals;
+			count = ARRAY_SIZE(rtl8367rb_initvals);
+			break;
 
-	rlvid = (chip_ver >> RTL8367B_CHIP_VER_RLVID_SHIFT) &
-		RTL8367B_CHIP_VER_RLVID_MASK;
+		case 0x1010:
+			initvals = rtl8367r_vb_initvals;
+			count = ARRAY_SIZE(rtl8367r_vb_initvals);
+			break;
 
-	switch (rlvid) {
-	case 0:
-		initvals = rtl8367r_vb_initvals_0;
-		count = ARRAY_SIZE(rtl8367r_vb_initvals_0);
-		break;
-
-	case 1:
-		initvals = rtl8367r_vb_initvals_1;
-		count = ARRAY_SIZE(rtl8367r_vb_initvals_1);
-		break;
-
-	default:
-		dev_err(smi->parent, "unknow rlvid %u\n", rlvid);
-		return -ENODEV;
+		default:
+			dev_err(smi->parent, "unknown chip %u\n", smi->chip_ver);
+			return -ENODEV;
 	}
 
 	/* TODO: disable RLTP */
@@ -1513,41 +1504,28 @@ static int rtl8367b_detect(struct rtl8366_smi *smi)
 	u32 chip_num;
 	u32 chip_ver;
 	u32 chip_mode;
-	int ret;
+	int err;
 
-	/* TODO: improve chip detection */
-	rtl8366_smi_write_reg(smi, RTL8367B_RTL_MAGIC_ID_REG,
-			      RTL8367B_RTL_MAGIC_ID_VAL);
+	REG_WR(smi, RTL8367B_RTL_MAGIC_ID_REG, RTL8367B_RTL_MAGIC_ID_VAL);
 
-	ret = rtl8366_smi_read_reg(smi, RTL8367B_CHIP_NUMBER_REG, &chip_num);
-	if (ret) {
-		dev_err(smi->parent, "unable to read %s register\n",
-			"chip number");
-		return ret;
-	}
-
-	ret = rtl8366_smi_read_reg(smi, RTL8367B_CHIP_VER_REG, &chip_ver);
-	if (ret) {
+	err = rtl8366_smi_read_reg(smi, RTL8367B_CHIP_VER_REG, &chip_ver);
+	if (err) {
 		dev_err(smi->parent, "unable to read %s register\n",
 			"chip version");
-		return ret;
-	}
-
-	ret = rtl8366_smi_read_reg(smi, RTL8367B_CHIP_MODE_REG, &chip_mode);
-	if (ret) {
-		dev_err(smi->parent, "unable to read %s register\n",
-			"chip mode");
-		return ret;
+		return err;
 	}
 
 	switch (chip_ver) {
-	case 0x1000:
-		chip_name = "8367RB";
-		break;
-	case 0x1010:
-		chip_name = "8367R-VB";
-		break;
+		case 0x1000:
+			chip_name = "8367RB";
+			break;
+		case 0x1010:
+			chip_name = "8367R-VB";
+			break;
 	default:
+		REG_RD(smi, RTL8367B_CHIP_NUMBER_REG, &chip_num);
+		REG_RD(smi, RTL8367B_CHIP_MODE_REG, &chip_mode);
+
 		dev_err(smi->parent,
 			"unknown chip num:%04x ver:%04x, mode:%04x\n",
 			chip_num, chip_ver, chip_mode);
@@ -1555,6 +1533,8 @@ static int rtl8367b_detect(struct rtl8366_smi *smi)
 	}
 
 	dev_info(smi->parent, "RTL%s chip found\n", chip_name);
+
+	smi->chip_ver = chip_ver;
 
 	return 0;
 }

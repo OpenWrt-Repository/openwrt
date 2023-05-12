@@ -17,6 +17,21 @@ else
 	UBIFS_OPTS := -m 2048 -e 126KiB -c 4096
 endif
 
+define Build/append-uImage-rootfs
+	mkimage -A mips -O linux -C none -T filesystem  \
+		-n 'OpenWRT RootFS' \
+		-d $(IMAGE_ROOTFS) $@.mkimage
+	cat $@.mkimage >> $@
+endef
+
+define Build/append-uImage-dummyrootfs
+	echo -n "dummy" > $@.dummyrootfs
+	mkimage -A mips -O linux -C none -T filesystem  \
+		-n 'OpenWRT dummy RootFS' \
+		-d $@.dummyrootfs $@.mkimage
+	cat $@.mkimage >> $@
+endef
+
 define Build/append-avm-fakeroot
 	cat ./eva.dummy.squashfs >> $@
 endef

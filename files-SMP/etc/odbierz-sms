@@ -1,0 +1,5 @@
+#!/bin/bash
+sms_tool -d /dev/ttyUSB0 -f "%Y-%m-%d %H:%M" recv > /tmp/sms.txt
+cat /tmp/sms.txt
+rm /tmp/sms.txt
+exit 0

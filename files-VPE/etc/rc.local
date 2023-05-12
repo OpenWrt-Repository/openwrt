@@ -1,0 +1,26 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+chmod 0400 /lib/firmware/voice_ar9_firmware.bin
+chmod 0400 /lib/firmware/ifx_firmware.bin
+
+#/etc/init.d/dnsmasq restart &
+#/etc/init.d/network reload
+#/etc/init.d/adblock reload &
+#/etc/init.d/asterisk restart &
+
+echo 1 > /proc/sys/net/netfilter/nf_conntrack_helper
+echo 0 > /proc/sys/net/ipv4/tcp_timestamps
+for i in /proc/sys/net/ipv4/conf/*/bootp_relay; do echo 0 > $i; done
+echo 2000 > /sys/module/block/parameters/events_dfl_poll_msecs
+echo 1 > /proc/sys/kernel/keys/maxkeys
+echo "bbr" > /proc/sys/net/ipv4/tcp_congestion_control
+#cat /proc/sys/net/ipv4/tcp_congestion_control
+
+echo 2000 > /proc/sys/net/core/netdev_max_backlog
+echo 2000 > /proc/sys/net/core/somaxconn
+sysctl -p >/dev/null 2>&1
+echo "1" >/sys/class/backlight/fb_ili9341_eb904/bl_power
+echo 0 > /sys/class/leds/VGV952CJW33\:red\:power/brightness
+/etc/speed
+exit 0

@@ -1,0 +1,4 @@
+#!/bin/bash
+echo '0' >>/sys/class/backlight/fb_ili9341_eb904/bl_power
+exit 0
+

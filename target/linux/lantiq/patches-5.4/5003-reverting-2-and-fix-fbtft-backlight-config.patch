@@ -1,0 +1,586 @@
+From 241edaa3372c4939c13bd3b55a565efcf03bc3ed Mon Sep 17 00:00:00 2001
+From: Jonas Albrecht <plonkbong100@protonmail.com>
+Date: Sun, 27 Feb 2022 22:40:51 +0000
+Subject: [PATCH 1/3] Revert "staging/fbtft: Fix backlight"
+
+This reverts commit e72e981d16fcc5bc1075c1fc606d439405eaa187.
+---
+ drivers/staging/fbtft/fb_ssd1351.c | 4 ++++
+ drivers/staging/fbtft/fbtft-core.c | 9 ++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/staging/fbtft/fb_ssd1351.c b/drivers/staging/fbtft/fb_ssd1351.c
+index 6fd549a424d5..cf263a58a148 100644
+--- a/drivers/staging/fbtft/fb_ssd1351.c
++++ b/drivers/staging/fbtft/fb_ssd1351.c
+@@ -187,6 +187,7 @@ static struct fbtft_display display = {
+ 	},
+ };
+ 
++#ifdef CONFIG_FB_BACKLIGHT
+ static int update_onboard_backlight(struct backlight_device *bd)
+ {
+ 	struct fbtft_par *par = bl_get_data(bd);
+@@ -230,6 +231,9 @@ static void register_onboard_backlight(struct fbtft_par *par)
+ 	if (!par->fbtftops.unregister_backlight)
+ 		par->fbtftops.unregister_backlight = fbtft_unregister_backlight;
+ }
++#else
++static void register_onboard_backlight(struct fbtft_par *par) { };
++#endif
+ 
+ FBTFT_REGISTER_DRIVER(DRVNAME, "solomon,ssd1351", &display);
+ 
+diff --git a/drivers/staging/fbtft/fbtft-core.c b/drivers/staging/fbtft/fbtft-core.c
+index 771697508cec..bc53d68bfcaa 100644
+--- a/drivers/staging/fbtft/fbtft-core.c
++++ b/drivers/staging/fbtft/fbtft-core.c
+@@ -136,6 +136,7 @@ static int fbtft_request_gpios_dt(struct fbtft_par *par)
+ }
+ #endif
+ 
++#ifdef CONFIG_FB_BACKLIGHT
+ static int fbtft_backlight_update_status(struct backlight_device *bd)
+ {
+ 	struct fbtft_par *par = bl_get_data(bd);
+@@ -168,7 +169,6 @@ void fbtft_unregister_backlight(struct fbtft_par *par)
+ 		par->info->bl_dev = NULL;
+ 	}
+ }
+-EXPORT_SYMBOL(fbtft_unregister_backlight);
+ 
+ static const struct backlight_ops fbtft_bl_ops = {
+ 	.get_brightness	= fbtft_backlight_get_brightness,
+@@ -206,7 +206,12 @@ void fbtft_register_backlight(struct fbtft_par *par)
+ 	if (!par->fbtftops.unregister_backlight)
+ 		par->fbtftops.unregister_backlight = fbtft_unregister_backlight;
+ }
++#else
++void fbtft_register_backlight(struct fbtft_par *par) { };
++void fbtft_unregister_backlight(struct fbtft_par *par) { };
++#endif
+ EXPORT_SYMBOL(fbtft_register_backlight);
++EXPORT_SYMBOL(fbtft_unregister_backlight);
+ 
+ static void fbtft_set_addr_win(struct fbtft_par *par, int xs, int ys, int xe,
+ 			       int ye)
+@@ -855,11 +860,13 @@ int fbtft_register_framebuffer(struct fb_info *fb_info)
+ 		 fb_info->fix.smem_len >> 10, text1,
+ 		 HZ / fb_info->fbdefio->delay, text2);
+ 
++#ifdef CONFIG_FB_BACKLIGHT
+ 	/* Turn on backlight if available */
+ 	if (fb_info->bl_dev) {
+ 		fb_info->bl_dev->props.power = FB_BLANK_UNBLANK;
+ 		fb_info->bl_dev->ops->update_status(fb_info->bl_dev);
+ 	}
++#endif
+ 
+ 	return 0;
+ 
+-- 
+2.32.0
+
+
+From 5bf9a0c55f189e49da497cd847d1236735d2ea7a Mon Sep 17 00:00:00 2001
+From: Jonas Albrecht <plonkbong100@protonmail.com>
+Date: Sun, 27 Feb 2022 22:40:53 +0000
+Subject: [PATCH 2/3] Revert "staging: fbtft: Rectify GPIO handling"
+
+This reverts commit fbe80b3ee91f07dea25aad8d27009fca39f77866.
+---
+ drivers/staging/fbtft/fb_agm1264k-fl.c | 20 ++++++++++----------
+ drivers/staging/fbtft/fb_bd663474.c    |  4 ++++
+ drivers/staging/fbtft/fb_ili9163.c     |  4 ++++
+ drivers/staging/fbtft/fb_ili9320.c     |  1 +
+ drivers/staging/fbtft/fb_ili9325.c     |  4 ++++
+ drivers/staging/fbtft/fb_ili9340.c     |  1 +
+ drivers/staging/fbtft/fb_s6d1121.c     |  4 ++++
+ drivers/staging/fbtft/fb_sh1106.c      |  1 +
+ drivers/staging/fbtft/fb_ssd1289.c     |  4 ++++
+ drivers/staging/fbtft/fb_ssd1325.c     |  2 ++
+ drivers/staging/fbtft/fb_ssd1331.c     |  6 ++++--
+ drivers/staging/fbtft/fb_ssd1351.c     |  1 +
+ drivers/staging/fbtft/fb_upd161704.c   |  4 ++++
+ drivers/staging/fbtft/fb_watterott.c   |  1 +
+ drivers/staging/fbtft/fbtft-bus.c      |  3 ++-
+ drivers/staging/fbtft/fbtft-core.c     | 13 +++++++------
+ drivers/staging/fbtft/fbtft-io.c       | 12 ++++++------
+ 17 files changed, 60 insertions(+), 25 deletions(-)
+
+diff --git a/drivers/staging/fbtft/fb_agm1264k-fl.c b/drivers/staging/fbtft/fb_agm1264k-fl.c
+index b545c2ca80a4..eeeeec97ad27 100644
+--- a/drivers/staging/fbtft/fb_agm1264k-fl.c
++++ b/drivers/staging/fbtft/fb_agm1264k-fl.c
+@@ -84,9 +84,9 @@ static void reset(struct fbtft_par *par)
+ 
+ 	dev_dbg(par->info->device, "%s()\n", __func__);
+ 
+-	gpiod_set_value(par->gpio.reset, 1);
+-	udelay(20);
+ 	gpiod_set_value(par->gpio.reset, 0);
++	udelay(20);
++	gpiod_set_value(par->gpio.reset, 1);
+ 	mdelay(120);
+ }
+ 
+@@ -194,12 +194,12 @@ static void write_reg8_bus8(struct fbtft_par *par, int len, ...)
+ 	/* select chip */
+ 	if (*buf) {
+ 		/* cs1 */
+-		gpiod_set_value(par->CS0, 0);
+-		gpiod_set_value(par->CS1, 1);
+-	} else {
+-		/* cs0 */
+ 		gpiod_set_value(par->CS0, 1);
+ 		gpiod_set_value(par->CS1, 0);
++	} else {
++		/* cs0 */
++		gpiod_set_value(par->CS0, 0);
++		gpiod_set_value(par->CS1, 1);
+ 	}
+ 
+ 	gpiod_set_value(par->RS, 0); /* RS->0 (command mode) */
+@@ -397,8 +397,8 @@ static int write_vmem(struct fbtft_par *par, size_t offset, size_t len)
+ 	}
+ 	kfree(convert_buf);
+ 
+-	gpiod_set_value(par->CS0, 0);
+-	gpiod_set_value(par->CS1, 0);
++	gpiod_set_value(par->CS0, 1);
++	gpiod_set_value(par->CS1, 1);
+ 
+ 	return ret;
+ }
+@@ -419,10 +419,10 @@ static int write(struct fbtft_par *par, void *buf, size_t len)
+ 		for (i = 0; i < 8; ++i)
+ 			gpiod_set_value(par->gpio.db[i], data & (1 << i));
+ 		/* set E */
+-		gpiod_set_value(par->EPIN, 0);
++		gpiod_set_value(par->EPIN, 1);
+ 		udelay(5);
+ 		/* unset E - write */
+-		gpiod_set_value(par->EPIN, 1);
++		gpiod_set_value(par->EPIN, 0);
+ 		udelay(1);
+ 	}
+ 
+diff --git a/drivers/staging/fbtft/fb_bd663474.c b/drivers/staging/fbtft/fb_bd663474.c
+index 1629c2c440a9..e2c7646588f8 100644
+--- a/drivers/staging/fbtft/fb_bd663474.c
++++ b/drivers/staging/fbtft/fb_bd663474.c
+@@ -12,6 +12,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ 
+ #include "fbtft.h"
+@@ -23,6 +24,9 @@
+ 
+ static int init_display(struct fbtft_par *par)
+ {
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
++
+ 	par->fbtftops.reset(par);
+ 
+ 	/* Initialization sequence from Lib_UTFT */
+diff --git a/drivers/staging/fbtft/fb_ili9163.c b/drivers/staging/fbtft/fb_ili9163.c
+index 6582a2c90aaf..05648c3ffe47 100644
+--- a/drivers/staging/fbtft/fb_ili9163.c
++++ b/drivers/staging/fbtft/fb_ili9163.c
+@@ -11,6 +11,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ #include <video/mipi_display.h>
+ 
+@@ -76,6 +77,9 @@ static int init_display(struct fbtft_par *par)
+ {
+ 	par->fbtftops.reset(par);
+ 
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
++
+ 	write_reg(par, MIPI_DCS_SOFT_RESET); /* software reset */
+ 	mdelay(500);
+ 	write_reg(par, MIPI_DCS_EXIT_SLEEP_MODE); /* exit sleep */
+diff --git a/drivers/staging/fbtft/fb_ili9320.c b/drivers/staging/fbtft/fb_ili9320.c
+index a8f4c618b754..f2e72d14431d 100644
+--- a/drivers/staging/fbtft/fb_ili9320.c
++++ b/drivers/staging/fbtft/fb_ili9320.c
+@@ -8,6 +8,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/spi/spi.h>
+ #include <linux/delay.h>
+ 
+diff --git a/drivers/staging/fbtft/fb_ili9325.c b/drivers/staging/fbtft/fb_ili9325.c
+index 16d3b17ca279..c9aa4cb43123 100644
+--- a/drivers/staging/fbtft/fb_ili9325.c
++++ b/drivers/staging/fbtft/fb_ili9325.c
+@@ -10,6 +10,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ 
+ #include "fbtft.h"
+@@ -84,6 +85,9 @@ static int init_display(struct fbtft_par *par)
+ {
+ 	par->fbtftops.reset(par);
+ 
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
++
+ 	bt &= 0x07;
+ 	vc &= 0x07;
+ 	vrh &= 0x0f;
+diff --git a/drivers/staging/fbtft/fb_ili9340.c b/drivers/staging/fbtft/fb_ili9340.c
+index 704236bcaf3f..415183c7054a 100644
+--- a/drivers/staging/fbtft/fb_ili9340.c
++++ b/drivers/staging/fbtft/fb_ili9340.c
+@@ -8,6 +8,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ #include <video/mipi_display.h>
+ 
+diff --git a/drivers/staging/fbtft/fb_s6d1121.c b/drivers/staging/fbtft/fb_s6d1121.c
+index 62f27172f844..8c7de3290343 100644
+--- a/drivers/staging/fbtft/fb_s6d1121.c
++++ b/drivers/staging/fbtft/fb_s6d1121.c
+@@ -12,6 +12,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ 
+ #include "fbtft.h"
+@@ -28,6 +29,9 @@ static int init_display(struct fbtft_par *par)
+ {
+ 	par->fbtftops.reset(par);
+ 
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
++
+ 	/* Initialization sequence from Lib_UTFT */
+ 
+ 	write_reg(par, 0x0011, 0x2004);
+diff --git a/drivers/staging/fbtft/fb_sh1106.c b/drivers/staging/fbtft/fb_sh1106.c
+index 7b9ab39e1c1a..6f7249493ea3 100644
+--- a/drivers/staging/fbtft/fb_sh1106.c
++++ b/drivers/staging/fbtft/fb_sh1106.c
+@@ -9,6 +9,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ 
+ #include "fbtft.h"
+diff --git a/drivers/staging/fbtft/fb_ssd1289.c b/drivers/staging/fbtft/fb_ssd1289.c
+index f27bab38b3ec..7a3fe022cc69 100644
+--- a/drivers/staging/fbtft/fb_ssd1289.c
++++ b/drivers/staging/fbtft/fb_ssd1289.c
+@@ -10,6 +10,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ 
+ #include "fbtft.h"
+ 
+@@ -27,6 +28,9 @@ static int init_display(struct fbtft_par *par)
+ {
+ 	par->fbtftops.reset(par);
+ 
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
++
+ 	write_reg(par, 0x00, 0x0001);
+ 	write_reg(par, 0x03, 0xA8A4);
+ 	write_reg(par, 0x0C, 0x0000);
+diff --git a/drivers/staging/fbtft/fb_ssd1325.c b/drivers/staging/fbtft/fb_ssd1325.c
+index 796a2ac3e194..8a3140d41d8b 100644
+--- a/drivers/staging/fbtft/fb_ssd1325.c
++++ b/drivers/staging/fbtft/fb_ssd1325.c
+@@ -35,6 +35,8 @@ static int init_display(struct fbtft_par *par)
+ {
+ 	par->fbtftops.reset(par);
+ 
++	gpiod_set_value(par->gpio.cs, 0);
++
+ 	write_reg(par, 0xb3);
+ 	write_reg(par, 0xf0);
+ 	write_reg(par, 0xae);
+diff --git a/drivers/staging/fbtft/fb_ssd1331.c b/drivers/staging/fbtft/fb_ssd1331.c
+index ec5eced7f8cb..37622c9462aa 100644
+--- a/drivers/staging/fbtft/fb_ssd1331.c
++++ b/drivers/staging/fbtft/fb_ssd1331.c
+@@ -81,7 +81,8 @@ static void write_reg8_bus8(struct fbtft_par *par, int len, ...)
+ 	va_start(args, len);
+ 
+ 	*buf = (u8)va_arg(args, unsigned int);
+-	gpiod_set_value(par->gpio.dc, 0);
++	if (par->gpio.dc)
++		gpiod_set_value(par->gpio.dc, 0);
+ 	ret = par->fbtftops.write(par, par->buf, sizeof(u8));
+ 	if (ret < 0) {
+ 		va_end(args);
+@@ -103,7 +104,8 @@ static void write_reg8_bus8(struct fbtft_par *par, int len, ...)
+ 			return;
+ 		}
+ 	}
+-	gpiod_set_value(par->gpio.dc, 1);
++	if (par->gpio.dc)
++		gpiod_set_value(par->gpio.dc, 1);
+ 	va_end(args);
+ }
+ 
+diff --git a/drivers/staging/fbtft/fb_ssd1351.c b/drivers/staging/fbtft/fb_ssd1351.c
+index cf263a58a148..900b28d826b2 100644
+--- a/drivers/staging/fbtft/fb_ssd1351.c
++++ b/drivers/staging/fbtft/fb_ssd1351.c
+@@ -2,6 +2,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/spi/spi.h>
+ #include <linux/delay.h>
+ 
+diff --git a/drivers/staging/fbtft/fb_upd161704.c b/drivers/staging/fbtft/fb_upd161704.c
+index c680160d6380..c77832ae5e5b 100644
+--- a/drivers/staging/fbtft/fb_upd161704.c
++++ b/drivers/staging/fbtft/fb_upd161704.c
+@@ -12,6 +12,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ 
+ #include "fbtft.h"
+@@ -25,6 +26,9 @@ static int init_display(struct fbtft_par *par)
+ {
+ 	par->fbtftops.reset(par);
+ 
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
++
+ 	/* Initialization sequence from Lib_UTFT */
+ 
+ 	/* register reset */
+diff --git a/drivers/staging/fbtft/fb_watterott.c b/drivers/staging/fbtft/fb_watterott.c
+index fc65ce876155..27cc8eabcbe9 100644
+--- a/drivers/staging/fbtft/fb_watterott.c
++++ b/drivers/staging/fbtft/fb_watterott.c
+@@ -8,6 +8,7 @@
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
++#include <linux/gpio/consumer.h>
+ #include <linux/delay.h>
+ 
+ #include "fbtft.h"
+diff --git a/drivers/staging/fbtft/fbtft-bus.c b/drivers/staging/fbtft/fbtft-bus.c
+index 3d422bc11641..63c65dd67b17 100644
+--- a/drivers/staging/fbtft/fbtft-bus.c
++++ b/drivers/staging/fbtft/fbtft-bus.c
+@@ -135,7 +135,8 @@ int fbtft_write_vmem16_bus8(struct fbtft_par *par, size_t offset, size_t len)
+ 	remain = len / 2;
+ 	vmem16 = (u16 *)(par->info->screen_buffer + offset);
+ 
+-	gpiod_set_value(par->gpio.dc, 1);
++	if (par->gpio.dc)
++		gpiod_set_value(par->gpio.dc, 1);
+ 
+ 	/* non buffered write */
+ 	if (!par->txbuf.buf)
+diff --git a/drivers/staging/fbtft/fbtft-core.c b/drivers/staging/fbtft/fbtft-core.c
+index bc53d68bfcaa..61f0286fb157 100644
+--- a/drivers/staging/fbtft/fbtft-core.c
++++ b/drivers/staging/fbtft/fbtft-core.c
+@@ -37,7 +37,8 @@ int fbtft_write_buf_dc(struct fbtft_par *par, void *buf, size_t len, int dc)
+ {
+ 	int ret;
+ 
+-	gpiod_set_value(par->gpio.dc, dc);
++	if (par->gpio.dc)
++		gpiod_set_value(par->gpio.dc, dc);
+ 
+ 	ret = par->fbtftops.write(par, buf, len);
+ 	if (ret < 0)
+@@ -78,7 +79,7 @@ static int fbtft_request_one_gpio(struct fbtft_par *par,
+ 	int ret = 0;
+ 
+ 	*gpiop = devm_gpiod_get_index_optional(dev, name, index,
+-					       GPIOD_OUT_LOW);
++					       GPIOD_OUT_HIGH);
+ 	if (IS_ERR(*gpiop)) {
+ 		ret = PTR_ERR(*gpiop);
+ 		dev_err(dev,
+@@ -229,15 +230,11 @@ static void fbtft_reset(struct fbtft_par *par)
+ {
+ 	if (!par->gpio.reset)
+ 		return;
+-
+ 	fbtft_par_dbg(DEBUG_RESET, par, "%s()\n", __func__);
+-
+ 	gpiod_set_value_cansleep(par->gpio.reset, 1);
+ 	usleep_range(20, 40);
+ 	gpiod_set_value_cansleep(par->gpio.reset, 0);
+ 	msleep(120);
+-
+-	gpiod_set_value_cansleep(par->gpio.cs, 1);  /* Activate chip */
+ }
+ 
+ static void fbtft_update_display(struct fbtft_par *par, unsigned int start_line,
+@@ -924,6 +921,8 @@ static int fbtft_init_display_dt(struct fbtft_par *par)
+ 		return -EINVAL;
+ 
+ 	par->fbtftops.reset(par);
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
+ 
+ 	while (p) {
+ 		if (val & FBTFT_OF_INIT_CMD) {
+@@ -1013,6 +1012,8 @@ int fbtft_init_display(struct fbtft_par *par)
+ 	}
+ 
+ 	par->fbtftops.reset(par);
++	if (par->gpio.cs)
++		gpiod_set_value(par->gpio.cs, 0);  /* Activate chip */
+ 
+ 	i = 0;
+ 	while (i < FBTFT_MAX_INIT_SEQUENCE) {
+diff --git a/drivers/staging/fbtft/fbtft-io.c b/drivers/staging/fbtft/fbtft-io.c
+index de1904a443c2..0863d257d762 100644
+--- a/drivers/staging/fbtft/fbtft-io.c
++++ b/drivers/staging/fbtft/fbtft-io.c
+@@ -142,12 +142,12 @@ int fbtft_write_gpio8_wr(struct fbtft_par *par, void *buf, size_t len)
+ 		data = *(u8 *)buf;
+ 
+ 		/* Start writing by pulling down /WR */
+-		gpiod_set_value(par->gpio.wr, 1);
++		gpiod_set_value(par->gpio.wr, 0);
+ 
+ 		/* Set data */
+ #ifndef DO_NOT_OPTIMIZE_FBTFT_WRITE_GPIO
+ 		if (data == prev_data) {
+-			gpiod_set_value(par->gpio.wr, 1); /* used as delay */
++			gpiod_set_value(par->gpio.wr, 0); /* used as delay */
+ 		} else {
+ 			for (i = 0; i < 8; i++) {
+ 				if ((data & 1) != (prev_data & 1))
+@@ -165,7 +165,7 @@ int fbtft_write_gpio8_wr(struct fbtft_par *par, void *buf, size_t len)
+ #endif
+ 
+ 		/* Pullup /WR */
+-		gpiod_set_value(par->gpio.wr, 0);
++		gpiod_set_value(par->gpio.wr, 1);
+ 
+ #ifndef DO_NOT_OPTIMIZE_FBTFT_WRITE_GPIO
+ 		prev_data = *(u8 *)buf;
+@@ -192,12 +192,12 @@ int fbtft_write_gpio16_wr(struct fbtft_par *par, void *buf, size_t len)
+ 		data = *(u16 *)buf;
+ 
+ 		/* Start writing by pulling down /WR */
+-		gpiod_set_value(par->gpio.wr, 1);
++		gpiod_set_value(par->gpio.wr, 0);
+ 
+ 		/* Set data */
+ #ifndef DO_NOT_OPTIMIZE_FBTFT_WRITE_GPIO
+ 		if (data == prev_data) {
+-			gpiod_set_value(par->gpio.wr, 1); /* used as delay */
++			gpiod_set_value(par->gpio.wr, 0); /* used as delay */
+ 		} else {
+ 			for (i = 0; i < 16; i++) {
+ 				if ((data & 1) != (prev_data & 1))
+@@ -215,7 +215,7 @@ int fbtft_write_gpio16_wr(struct fbtft_par *par, void *buf, size_t len)
+ #endif
+ 
+ 		/* Pullup /WR */
+-		gpiod_set_value(par->gpio.wr, 0);
++		gpiod_set_value(par->gpio.wr, 1);
+ 
+ #ifndef DO_NOT_OPTIMIZE_FBTFT_WRITE_GPIO
+ 		prev_data = *(u16 *)buf;
+-- 
+2.32.0
+
+
+From 6126dfabaa5edf3987c0170639f1886c0d6ee56b Mon Sep 17 00:00:00 2001
+From: Jonas Albrecht <plonkbong100@protonmail.com>
+Date: Mon, 28 Feb 2022 02:18:55 +0000
+Subject: [PATCH 3/3] kernel: fix fbtft backlight config
+
+Signed-off-by: Jonas Albrecht <plonkbong100@protonmail.com>
+---
+ drivers/staging/fbtft/fb_ssd1351.c   | 2 +-
+ drivers/staging/fbtft/fb_watterott.c | 2 +-
+ drivers/staging/fbtft/fbtft-core.c   | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/staging/fbtft/fb_ssd1351.c b/drivers/staging/fbtft/fb_ssd1351.c
+index 900b28d826b2..14b9d70e17ec 100644
+--- a/drivers/staging/fbtft/fb_ssd1351.c
++++ b/drivers/staging/fbtft/fb_ssd1351.c
+@@ -188,7 +188,7 @@ static struct fbtft_display display = {
+ 	},
+ };
+ 
+-#ifdef CONFIG_FB_BACKLIGHT
++#if IS_ENABLED(CONFIG_FB_BACKLIGHT)
+ static int update_onboard_backlight(struct backlight_device *bd)
+ {
+ 	struct fbtft_par *par = bl_get_data(bd);
+diff --git a/drivers/staging/fbtft/fb_watterott.c b/drivers/staging/fbtft/fb_watterott.c
+index 27cc8eabcbe9..36ca32ca7183 100644
+--- a/drivers/staging/fbtft/fb_watterott.c
++++ b/drivers/staging/fbtft/fb_watterott.c
+@@ -215,7 +215,7 @@ static int verify_gpios(struct fbtft_par *par)
+ 	return 0;
+ }
+ 
+-#ifdef CONFIG_FB_BACKLIGHT
++#if IS_ENABLED(CONFIG_FB_BACKLIGHT)
+ static int backlight_chip_update_status(struct backlight_device *bd)
+ {
+ 	struct fbtft_par *par = bl_get_data(bd);
+diff --git a/drivers/staging/fbtft/fbtft-core.c b/drivers/staging/fbtft/fbtft-core.c
+index 61f0286fb157..4da91f9713fc 100644
+--- a/drivers/staging/fbtft/fbtft-core.c
++++ b/drivers/staging/fbtft/fbtft-core.c
+@@ -137,7 +137,7 @@ static int fbtft_request_gpios_dt(struct fbtft_par *par)
+ }
+ #endif
+ 
+-#ifdef CONFIG_FB_BACKLIGHT
++#if IS_ENABLED(CONFIG_FB_BACKLIGHT)
+ static int fbtft_backlight_update_status(struct backlight_device *bd)
+ {
+ 	struct fbtft_par *par = bl_get_data(bd);
+@@ -857,7 +857,7 @@ int fbtft_register_framebuffer(struct fb_info *fb_info)
+ 		 fb_info->fix.smem_len >> 10, text1,
+ 		 HZ / fb_info->fbdefio->delay, text2);
+ 
+-#ifdef CONFIG_FB_BACKLIGHT
++#if IS_ENABLED(CONFIG_FB_BACKLIGHT)
+ 	/* Turn on backlight if available */
+ 	if (fb_info->bl_dev) {
+ 		fb_info->bl_dev->props.power = FB_BLANK_UNBLANK;
+-- 
+2.32.0
+
