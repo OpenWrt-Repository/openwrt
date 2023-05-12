@@ -39,3 +39,5 @@ subversion libz-dev libc-dev rsync which
 ## License
 
 OpenWrt is licensed under GPL-2.0
+> It based on https://github.com/Plonkbong/openwrt/tree/xrx200-21.02.2
+
