@@ -101,3 +101,5 @@ uci commit adblock
 
 #usermod -aG audio,dialout asterisk
 #usermod -aG audio,dialout root
+
+chmod 600 /etc/lcd4linux.conf
