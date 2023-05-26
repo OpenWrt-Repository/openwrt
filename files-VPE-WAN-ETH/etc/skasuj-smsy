@@ -1,0 +1,6 @@
+#!/bin/bash
+sms_tool -d /dev/ttyUSB0 delete all >/dev/null 2>&1
+echo Skasowane!
+echo Deleted!
+exit 0
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+#!/bin/sh
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0/queues/rx-0/rps_cpus
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.1/queues/rx-0/rps_cpus
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.2/queues/rx-0/rps_cpus
+echo 2000 > /proc/sys/net/core/netdev_max_backlog
+echo 2000 > /proc/sys/net/core/somaxconn
+exit 0
+
