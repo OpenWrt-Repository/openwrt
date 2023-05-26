@@ -1,65 +1,9 @@
 # Put your custom commands here that should be executed once
 # the system init finished. By default this file does nothing.
 
-chmod 0400 /lib/firmware/voice_ar9_firmware.bin
-chmod 0400 /lib/firmware/ifx_firmware.bin
-
-#fsck.ext4 -y /dev/sda1 &
-#mount -t ext4 /dev/sda1 /mnt/sda1 &
-#chmod 777 /mnt/sda1 &
-
-#umount /mnt/sda1
-#fsck.f2fs -y /dev/sda1
-#mount -t f2fs /dev/sda1 /mnt/sda1
-#hdparm -a 2048 /dev/sda1 &
-
 #/etc/init.d/dnsmasq restart &
-#/etc/init.d/stubby restart &
-#/etc/init.d/unbound restart &
-#/etc/init.d/asterisk restart &
-#/etc/init.d/ddns restart &
-
 #/etc/init.d/network reload
-#sleep 3
-#/etc/speed
-
-#echo "0" > /sys/class/net/br-lan/bridge/vlan_filtering
-#echo "0" > /sys/class/net/eth0.2/bridge/vlan_filtering
-#echo 0 > /sys/class/net/eth0.2/bridge/nf_call_iptables
-#echo 0 > /sys/class/net/br-lan/bridge/nf_call_iptables
-
-#https://bugs.openwrt.org/index.php?do=details&task_id=2573
-#Only cpu 0 should handle something:  00000001 (decimal 1)
-#Only cpu 1 should handle something:  00000010 (decimal 2)
-#cpu0 & cpu 1 should handle something: 00000011 (decimal 3)
-#echo 1 >   /sys/class/net/br-lan/queues/rx-0/rps_cpus
-#echo 1 >   /sys/class/net/eth0.1/queues/rx-0/rps_cpus
-#echo 1 >   /sys/class/net/eth0.2/queues/rx-0/rps_cpus
-#echo 1 >   /sys/class/net/eth0.3/queues/rx-0/rps_cpus
-#echo 1 >   /sys/class/net/eth0.66/queues/rx-0/rps_cpus
-#echo 1 >   /sys/class/net/eth0/queues/rx-0/rps_cpus
-#echo 1 >   /sys/class/net/lo/queues/rx-0/rps_cpus
-
-#echo 1 >   /sys/class/net/br-lan/queues/tx-0/xps_cpus
-#echo 1 >   /sys/class/net/eth0.1/queues/tx-0/xps_cpus
-#echo 1 >   /sys/class/net/eth0.2/queues/tx-0/xps_cpus
-#echo 1 >   /sys/class/net/eth0.3/queues/tx-0/xps_cpus
-#echo 1 >   /sys/class/net/eth0.66/queues/tx-0/xps_cpus
-#echo 1 >   /sys/class/net/eth0/queues/tx-0/xps_cpus
-#echo 1 >   /sys/class/net/lo/queues/tx-0/xps_cpus
-
-#echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0/queues/rx-0/rps_cpus
-echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.1/queues/rx-0/rps_cpus
-#echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/br-lan/queues/rx-0/rps_cpus
-echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.2/queues/rx-0/rps_cpus
-#echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.7/queues/rx-0/rps_cpus
-#echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/pppoe-wan/queues/rx-0/rps_cpus
-#echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/dsl0/queues/rx-0/rps_cpus
-#echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/dsl0.7/queues/rx-0/rps_cpus
-#echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/ptm0/queues/rx-0/rps_cpus
-
-#cat /proc/interrupts; grep . /proc/irq/*/smp_affinity_list
-# grep . /sys/class/net/*/queues/*/rps_cpus
+#/etc/init.d/adblock reload &
 
 echo 1 > /proc/sys/net/netfilter/nf_conntrack_helper
 echo 0 > /proc/sys/net/ipv4/tcp_timestamps
@@ -69,20 +13,11 @@ echo 1 > /proc/sys/kernel/keys/maxkeys
 echo "bbr" > /proc/sys/net/ipv4/tcp_congestion_control
 #cat /proc/sys/net/ipv4/tcp_congestion_control
 
-#ifconfig lo txqueuelen 2000
-#ifconfig eth0 txqueuelen 2000
-#ifconfig eth0.1 txqueuelen 2000
-#ifconfig eth0.2 txqueuelen 2000
-#ifconfig eth0.7 txqueuelen 2000
-#ifconfig br-lan txqueuelen 2000
-#ifconfig br-wan txqueuelen 2000
-
-#echo 2000 > /proc/sys/net/core/netdev_max_backlog
-#echo 2000 > /proc/sys/net/core/somaxconn
-echo "0" > /sys/devices/virtual/net/br-lan/bridge/multicast_snooping
-#echo $((500 + ${echo $((500 + ${RANDOM} % 1500)) > /proc/sys/net/ipv4/icmp_ratelimit
-#echo $((500 + ${echo $((500 + ${RANDOM} % 1500)) > /proc/sys/net/ipv6/icmp/ratelimit
+echo 2000 > /proc/sys/net/core/netdev_max_backlog
+echo 2000 > /proc/sys/net/core/somaxconn
 sysctl -p >/dev/null 2>&1
 echo "1" >/sys/class/backlight/fb_ili9341_eb904/bl_power
 echo 0 > /sys/class/leds/VGV952CJW33\:red\:power/brightness
+echo '0' >>/sys/class/backlight/fb_ili9341_eb904/bl_power
+/etc/speed
 exit 0

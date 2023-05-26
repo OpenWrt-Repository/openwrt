@@ -48,11 +48,11 @@ config command
 
 config command
 	option name 'WiFi On'
-	option command '/etc/wifi-5ghz-on'
+	option command '/etc/wifi-on'
 
 config command
 	option name 'WiFi Off'
-	option command '/etc/wifi-5ghz-off'
+	option command '/etc/wifi-off'
 
 config command
 	option name 'WiFi default'
