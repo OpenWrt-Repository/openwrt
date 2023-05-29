@@ -1,4 +1,5 @@
 ## OpenWrt 21.02.7 with support for Arcadyan/Astoria Easybox 904 xDSL (VGV952CJW33-E-IR)
+[![Openwrt](https://img.shields.io/badge/os-OpenWrt-<COLOR>.svg)](https://github.com/OpenWrt-Repository/) [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://github.com/OpenWrt-Repository/openwrt#license)
 
 ### Requirements
 
