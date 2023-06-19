@@ -1,4 +1,4 @@
-From f14345422747a495a52f9237a43b8be189f21912 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Eneas U de Queiroz <cote2004-github@yahoo.com>
 Date: Mon, 5 Nov 2018 15:54:17 -0200
 Subject: eng_devcrypto: save ioctl if EVP_MD_..FLAG_ONESHOT

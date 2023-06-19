@@ -38,7 +38,6 @@ arcadyan,vgv952cjw33-e-ir-vpe|arcadyan,vgv952cjw33-e-ir-smp)
 	uci -q batch <<-EOF
 		set network.wlan_dev='device'
 		set network.wlan_dev.name='eth0.66'
-		add_list network.lan.ifname='eth0.66'
 	EOF
 
 	# Add interface for guest wlan traffic
