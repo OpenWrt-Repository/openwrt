@@ -103,3 +103,98 @@ uci commit adblock
 #usermod -aG audio,dialout root
 
 chmod 600 /etc/lcd4linux.conf
+
+uci del network.globals.ula_prefix
+uci set network.@device[0].ports=''eth0.1' 'eth0.66''
+uci set network.@device[0].macaddr='00:11:22:33:44:00'
+uci set network.globals.packet_steering='1'
+uci del network.lan.ip6assign='60'
+uci set network.lan.ipv6='1'
+uci set network.lan.stp='1'
+uci set network.lan.force_link='0'
+uci set network.atm.encaps='llc'
+uci set network.atm.payload='bridged'
+uci set network.atm.nameprefix='dsl'
+uci set network.atm.vci='35'
+uci set network.atm.vpi='8'
+uci set network.dsl.tone='av'
+uci set network.dsl.annex='b'
+uci set network.dsl.xfer_mode='ptm'
+uci set network.dsl.line_mode='vdsl'
+uci set network.dsl.ds_snr_offset='0'
+uci set network.wan=interface
+uci set network.wan.device='dsl0'
+uci set network.wan.proto='pppoe'
+uci set network.wan.ipv6='1'
+uci set network.wan.metric='20'
+uci set network.wan.username='user@dialnet.pl'
+uci set network.wan.password='passwd'
+uci set network.wan.keepalive='0'
+uci set network.wan.ifname='dsl0.35'
+uci set network.wan.auto='1'
+uci set network.wan6=interface
+uci set network.wan6.device='@wan'
+uci set network.wan6.proto='dhcpv6'
+uci commit network
+
+cat << EOF >> /etc/config/network
+
+config interface 'hilink'
+	option proto 'dhcp'
+	option ipv6 '0'
+	option metric '10'
+	option delegate '0'
+	option auto '1'
+	option device 'eth1'
+
+config interface 'wwan'
+	option proto 'dhcp'
+	option ipv6 '0'
+	option auto '1'
+	option metric '10'
+	option device 'usb0'
+
+config interface 'umts'
+	option proto '3g'
+	option device '/dev/ttyUSB0'
+	option service 'umts'
+	option apn 'internet'
+	option dialnumber '*99***1#'
+	option ipv6 '0'
+	option auto '1'
+	option metric '10'
+
+config interface 'PPTP'
+	option proto 'pptp'
+	option keepalive '0'
+	option ipv6 '0'
+	option auto '0'
+	option server 'pl02.vpnonline.eu'
+	option username 'twoj login'
+	option password 'twoje haslo'
+	option metric '10'
+
+config interface 'TUN'
+	option proto 'none'
+	option delegate '0'
+	option auto '1'
+	option metric '10'
+	option device 'tun0'
+
+config interface 'NCM'
+	option proto 'ncm'
+	option delegate '0'
+	option device '/dev/ttyUSB0'
+	option service 'preferlte'
+	option pdptype 'IP'
+	option apn 'internet'
+	option ipv6 '0'
+	option auto '0'
+	option metric '10'
+EOF
+
+uci commit network
+
+uci set system.@system[0].description='EasyBOX xDSL904'
+uci set system.@system[0].notes='Arcadyan/Astoria (VGV952CJW33-E-IR)'
+uci commit system

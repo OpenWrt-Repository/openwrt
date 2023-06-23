@@ -45,14 +45,21 @@ free_mem="$(awk '/^MemFree:/ {print $2*1024}' /proc/meminfo)"
 free_mem="$((free_mem + buffers_mem + cached_mem))"
 MEM=$(echo "total: "$(hr $total_mem)", free: "$(hr $free_mem)", used: "$(( (total_mem - free_mem) * 100 / total_mem))"%")
 
+KERN=$(uname -r -o)
+WLAN1=$(iwconfig wl010 | grep SSID | cut -c 26-70 | sed -e 's/"/ /g')
+WLAN2=$(iwconfig wl000 | grep SSID | cut -c 26-70 | sed -e 's/"/ /g')
+
 printf " | %-""$LINE""s |\n" "Machine: $MACH"
+printf " | %-""$LINE""s |\n" "Kernel: $KERN"
 printf " | %-""$LINE""s |\n" "Uptime: $U"
 printf " | %-""$LINE""s |\n" "Load: $L"
 printf " | %-""$LINE""s |\n" "Flash: $RFS"
 printf " | %-""$LINE""s |\n" "Memory: $MEM"
+printf " | %-""$LINE""s |\n" "WLAN 2.4 GHz SSID: $WLAN1"
+printf " | %-""$LINE""s |\n" "WLAN 5 GHz SSID: $WLAN2"
 
 if [ -e /tmp/dhcp.leases ]; then
-	printf " | %-""$LINE""s |\n" "Leases: "$(awk 'END {print NR}' /tmp/dhcp.leases)
+	printf " | %-""$LINE""s |\n" "DHCP Leases: "$(awk 'END {print NR}' /tmp/dhcp.leases)
 fi
 
 SEC=$(uci show network | awk -F[\.=] '/=interface/{print $2}')

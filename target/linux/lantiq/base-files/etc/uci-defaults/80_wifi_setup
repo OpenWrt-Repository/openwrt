@@ -18,6 +18,7 @@ arcadyan,vgv952cjw33-e-ir-vpe|arcadyan,vgv952cjw33-e-ir-smp)
 	uci -q batch <<-EOF
 		set network.inic_dev='device'
 		set network.inic_dev.name='eth0.3'
+		set network.inic_dev.macaddr='00:11:22:33:44:33'
 
 		set network.inic='interface'
 		set network.inic.proto='none'
@@ -38,12 +39,7 @@ arcadyan,vgv952cjw33-e-ir-vpe|arcadyan,vgv952cjw33-e-ir-smp)
 	uci -q batch <<-EOF
 		set network.wlan_dev='device'
 		set network.wlan_dev.name='eth0.66'
-	EOF
-
-	# Add interface for guest wlan traffic
-	uci -q batch <<-EOF
-		set network.guest_wlan_dev='device'
-		set network.guest_wlan_dev.name='eth0.71'
+		set network.wlan_dev.macaddr='00:11:22:33:44:66'
 	EOF
 
 	# Add VLAN with tagged port for communicating with the iNIC wlan
@@ -54,6 +50,13 @@ arcadyan,vgv952cjw33-e-ir-vpe|arcadyan,vgv952cjw33-e-ir-smp)
 		set network.@switch_vlan[-1].vid='66'
 		set network.@switch_vlan[-1].fid='4'
 		set network.@switch_vlan[-1].ports='5t 6t'
+	EOF
+
+	# Add interface for guest wlan traffic
+	uci -q batch <<-EOF
+		set network.guest_wlan_dev='device'
+		set network.guest_wlan_dev.name='eth0.71'
+		set network.guest_wlan_dev.macaddr='00:11:22:33:44:71'
 	EOF
 
 	# Add VLAN with tagged port for communicating with the iNIC guest wlan

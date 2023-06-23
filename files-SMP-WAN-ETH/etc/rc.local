@@ -20,4 +20,5 @@ echo "1" >/sys/class/backlight/fb_ili9341_eb904/bl_power
 echo 0 > /sys/class/leds/VGV952CJW33\:red\:power/brightness
 echo '0' >>/sys/class/backlight/fb_ili9341_eb904/bl_power
 /etc/speed
+/etc/red-led-off
 exit 0
