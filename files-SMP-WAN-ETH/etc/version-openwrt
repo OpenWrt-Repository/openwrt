@@ -1,7 +1,7 @@
 #!/bin/bash
 echo
 egrep '"id":' /etc/board.json | sed -nE 's/(\s*"id":\s")(.*)(",)/\2/p'; 
-cat /etc/openwrt_release | grep DISTRIB_DESCRIPTION | cut -c 22-54
+cat /etc/openwrt_release | grep DISTRIB_DESCRIPTION | cut -c 22-61
 #egrep 'OPENWRT_RELEASE' /etc/os-release | sed -nE 's/(OPENWRT_RELEASE=")(.*)(")/\2/p'
 #cat /proc/version
 uname  -m -r -s
