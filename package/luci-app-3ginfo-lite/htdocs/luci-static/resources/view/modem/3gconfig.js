@@ -7,7 +7,9 @@
 'require tools.widgets as widgets'
 
 /*
-	Copyright 2021-2022 Rafał Wabik - IceG - From eko.one.pl forum
+	Copyright 2021-2023 Rafał Wabik - IceG - From eko.one.pl forum
+	
+	Licensed to the GNU General Public License v3.0.
 */
 
 return view.extend({
@@ -29,7 +31,7 @@ return view.extend({
 		o = s.option(widgets.DeviceSelect, 'network', _('Interface'),
 		_('Network interface for Internet access.')
 		);
-		o.noaliases  = true;
+		o.noaliases  = false;
 		o.default = 'wan';
 		o.rmempty = false;
 

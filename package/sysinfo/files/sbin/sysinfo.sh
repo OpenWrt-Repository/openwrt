@@ -46,10 +46,12 @@ free_mem="$((free_mem + buffers_mem + cached_mem))"
 MEM=$(echo "total: "$(hr $total_mem)", free: "$(hr $free_mem)", used: "$(( (total_mem - free_mem) * 100 / total_mem))"%")
 
 KERN=$(uname -r -o)
+SYS=$(egrep 'OPENWRT_RELEASE' /etc/os-release | sed -nE 's/(OPENWRT_RELEASE=")(.*)(")/\2/p')
 WLAN1=$(iwconfig wl010 | grep SSID | cut -c 26-70 | sed -e 's/"/ /g')
 WLAN2=$(iwconfig wl000 | grep SSID | cut -c 26-70 | sed -e 's/"/ /g')
 
 printf " | %-""$LINE""s |\n" "Machine: $MACH"
+printf " | %-""$LINE""s |\n" "OS: $SYS"
 printf " | %-""$LINE""s |\n" "Kernel: $KERN"
 printf " | %-""$LINE""s |\n" "Uptime: $U"
 printf " | %-""$LINE""s |\n" "Load: $L"
