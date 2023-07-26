@@ -183,3 +183,7 @@ uci commit network
 uci set system.@system[0].description='EasyBOX xDSL904'
 uci set system.@system[0].notes='Arcadyan/Astoria (VGV952CJW33-E-IR)'
 uci commit system
+
+chgrp root /dev/crypto
+chmod g+r /dev/crypto
+chmod o+r /dev/crypto
