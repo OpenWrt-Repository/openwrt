@@ -88,9 +88,8 @@ fi
 
 # Protocol
 # DRIVER=QMI_WWAN & DRIVER=CDC_MBIM & DRIVER=CDC_ETHER
-PV=$(cat /sys/kernel/debug/usb/devices 2>/dev/null)
-PVCUT=$(echo $PV | awk -F 'Vendor=413c ProdID=81b6' '{print $2}' | cut -c-1290)
-
+PV=$(cat /sys/kernel/debug/usb/devices)
+PVCUT=$(echo $PV | awk -F 'Vendor=413c ProdID=81b1' '{print $2}' | cut -c-1100)
 if echo "$PVCUT" | grep -q "Driver=qmi_wwan"
 then
     PROTO="qmi"
