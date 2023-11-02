@@ -24,7 +24,8 @@ return view.extend({
 			var out = document.querySelector('.smscommand-output');
 			out.style.display = '';
 
-			res.stdout = res.stdout.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, "")
+			res.stdout = res.stdout?.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, "") || '';
+			res.stderr = res.stderr?.replace(/^(?=\n)$|^\s*|\s*$|\n\n+/gm, "") || '';
 
 	 		var cut = res.stdout;
 			cut = cut.substr(0, 20);
