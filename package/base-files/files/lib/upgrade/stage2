@@ -113,6 +113,8 @@ kill_remaining() { # [ <signal> [ <loop> ] ]
 
 indicate_upgrade
 
+killall -9 nlbwmon
+killall -9 asterisk
 killall -9 telnetd
 killall -9 dropbear
 killall -9 ash
