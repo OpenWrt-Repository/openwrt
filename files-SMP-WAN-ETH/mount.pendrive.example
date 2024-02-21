@@ -1,4 +1,0 @@
-umount /mnt/sda1
-fsck.f2fs -y /dev/sda1
-mount -t f2fs /dev/sda1 /mnt/sda1
-hdparm -a 2048 /dev/sda1

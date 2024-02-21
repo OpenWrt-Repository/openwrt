@@ -1,7 +1,0 @@
-config '3ginfo'
-#	option 'device' '192.168.8.1'
-	option 'device' '/dev/ttyUSB0'
-	option 'pincode' ''
-	option 'http_port' '81'
-	option 'language' 'pl'
-	option 'network' 'umts'

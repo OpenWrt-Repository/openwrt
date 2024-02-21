@@ -1,4 +1,0 @@
-#!/bin/bash
-tar -zcvf asterisk-log.tar.gz /tmp/log/asterisk/
-exit 0
-
