@@ -53,7 +53,6 @@ asterisk-res-agi \
 asterisk-res-clioriginate \
 asterisk-res-http-websocket \
 asterisk-res-monitor \
-asterisk-res-resolver-unbound \
 asterisk-res-rtp-asterisk \
 asterisk-res-speech \
 asterisk-res-stun-monitor \

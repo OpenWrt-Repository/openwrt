@@ -95,24 +95,20 @@ config command
 	option command '/etc/skasuj-smsy'
 
 config command
-	option name 'install Asterisk'
-	option command '/etc/install-asterisk'
-
-config command
-	option name 'uninstall Asterisk'
-	option command '/etc//delete-asterisk'
-
-config command
-	option name 'Asterisk logs'
-	option command 'cat /tmp/log/asterisk/messages'
-
-config command
 	option name 'Hilink start'
 	option command 'ifup hilink'
 
 config command
 	option name 'Hilink stop'
 	option command 'ifdown hilink && ifup wan'
+
+config command
+	option name 'switch to WAN-Ethernet eth0.2'
+	option command '/etc/delete-adsl'
+
+config command
+	option name 'install Asterisk'
+	option command '/etc/install-asterisk'
 
 config command
 	option name 'version OpenWrt'

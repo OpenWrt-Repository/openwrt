@@ -1,7 +1,12 @@
 #!/bin/bash
 #!/bin/sh
 echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0/queues/rx-0/rps_cpus
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/br-lan/queues/rx-0/rps_cpus
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0/queues/rx-0/rps_cpus
 echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.1/queues/rx-0/rps_cpus
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.66/queues/rx-0/rps_cpus
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/lo/queues/rx-0/rps_cpus
+echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/eth0.3/queues/rx-0/rps_cpus
 echo "obase=16;2^$(nproc)-1" | bc > /sys/class/net/pppoe-wan/queues/rx-0/rps_cpus
 echo 2000 > /proc/sys/net/core/netdev_max_backlog
 echo 2000 > /proc/sys/net/core/somaxconn

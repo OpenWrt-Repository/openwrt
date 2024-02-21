@@ -16,6 +16,7 @@ config zone
 	option output 'ACCEPT'
 	option forward 'ACCEPT'
 	option network 'lan'
+	option masq_allow_invalid '1'
 
 config zone
 	option name 'wan'
@@ -25,6 +26,7 @@ config zone
 	option conntrack '1'
 	option masq '1'
 	option mtu_fix '1'
+	option masq_allow_invalid '1'
 	option network 'wan wwan PPTP TUN wg0 NCM upcwifree umts hilink'
 
 config forwarding
@@ -137,32 +139,6 @@ config rule
 	option dest_port '500'
 	option proto 'udp'
 	option target 'ACCEPT'
-
-config rule
-	option target 'ACCEPT'
-	option src 'wan'
-	option dest_port '5060'
-	option name 'Allow VoIP Handling'
-	option proto 'udp'
-	option family 'ipv4'
-	option dest_ip '192.168.1.1'
-
-config rule
-	option target 'ACCEPT'
-	option src 'wan'
-	option dest_port '52000'
-	option name 'Allow VoIP Handling'
-	option proto 'tcp udp'
-	option family 'ipv4'
-	option dest_ip '192.168.1.1'
-
-config rule
-	option target 'ACCEPT'
-	option src 'wan'
-	option proto 'udp'
-	option name 'Allow VoIP Stream'
-	option dest_ip '192.168.1.1'
-	option dest_port '10000-20000'
 
 config rule
 	option name 'Block-Public-DNS'
@@ -319,6 +295,42 @@ config rule
 	option target 'ACCEPT'
 	list proto 'tcp'
 	list proto 'udp'
+
+config zone 'pppoezone'
+	option name 'pppoe'
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'DROP'
+	list device 'ppp+'
+
+config forwarding 'pppoeforwarding'
+	option src 'pppoe'
+	option dest 'wan'
+
+config zone
+	option name 'home'
+	option input 'ACCEPT'
+	option forward 'ACCEPT'
+	option output 'ACCEPT'
+	option network 'home'
+	option masq '1'
+
+config forwarding
+	option src 'home'
+	option dest 'wan'
+
+config forwarding
+	option src 'home'
+	option dest 'lan'
+
+config forwarding
+	option src 'lan'
+	option dest 'home'
+
+config include 'zerotier'
+	option type 'script'
+	option path '/usr/share/zerotier/firewall.include'
+	option reload '1'
 
 config include
 	option path '/etc/firewall.user'

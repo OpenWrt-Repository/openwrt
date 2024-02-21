@@ -106,7 +106,8 @@ chmod 600 /etc/lcd4linux.conf
 
 uci del network.globals.ula_prefix
 uci set network.@device[0].ports=''eth0.1' 'eth0.66''
-uci set network.@device[0].macaddr='00:11:22:33:44:00'
+uci set network.@device[0].macaddr='00:11:22:33:44:01'
+uci set network.@device[0].stp='1'
 uci set network.globals.packet_steering='1'
 uci del network.lan.ip6assign='60'
 uci set network.lan.ipv6='1'
@@ -138,6 +139,11 @@ uci set network.wan6.proto='dhcpv6'
 uci commit network
 
 cat << EOF >> /etc/config/network
+
+config device
+	option name 'eth0'
+	option mtu '1500'
+	option macaddr '00:11:22:33:44:00'
 
 config interface 'hilink'
 	option proto 'dhcp'
@@ -202,3 +208,26 @@ uci commit system
 chgrp root /dev/crypto
 chmod g+r /dev/crypto
 chmod o+r /dev/crypto
+
+/etc/init.d/dnscrypt-proxy disable
+
+#uci set firewall.pppoezone=zone
+#uci set firewall.pppoezone.name=pppoe
+#uci set firewall.pppoezone.input=ACCEPT
+#uci set firewall.pppoezone.output=ACCEPT
+#uci set firewall.pppoezone.forward=DROP
+#uci add_list firewall.pppoezone.device=ppp+
+#uci set firewall.pppoeforwarding=forwarding
+#uci set firewall.pppoeforwarding.src=pppoe
+#uci set firewall.pppoeforwarding.dest=wan
+#uci commit firewall
+
+cd /usr/bin
+rm -rf awk
+ln -s gawk awk
+cd 
+
+/etc/init.d/zerotier disable
+
+uci set uhttpd.main.script_timeout='260'
+uci commit uhttpd
