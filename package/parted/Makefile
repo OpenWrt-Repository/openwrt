@@ -7,13 +7,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=parted
-PKG_VERSION:=3.3
+PKG_VERSION:=3.6
 PKG_RELEASE:=1
 
-PKG_BUILD_DIR:=$(BUILD_DIR)/parted-$(PKG_VERSION)
-PKG_SOURCE:=parted-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=@GNU/parted
-PKG_MD5SUM:=090655d05f3c471aa8e15a27536889ec
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
+PKG_SOURCE_URL:=http://ftp.gnu.org/gnu/parted/
+PKG_HASH:=3b43dbe33cca0f9a18601ebab56b7852b128ec1a3df3a9b30ccde5e73359e612
 
 include $(INCLUDE_DIR)/package.mk
 define Package/parted
