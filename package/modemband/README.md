@@ -18,10 +18,14 @@ Supported devices:
 - Quectel EM12-G
 - Quectel EM160R-GL
 - Quectel EP06-E
+- Quectel RG500Q-EA
 - Quectel RG502Q-EA
 - Quectel RM500Q-GL
+- Quectel RM500U-CNV
 - Quectel RM502Q-AE
 - Quectel RM520N-GL
+- Sierra Wireless EM7455/MC7455/DW5811e
+- SIMCOM SIM8200EA-M2
 - Telit LM940
 - Telit LN940 (Foxconn T77W676)
 - Telit LN940 (Foxconn T77W676) in mbim mode
