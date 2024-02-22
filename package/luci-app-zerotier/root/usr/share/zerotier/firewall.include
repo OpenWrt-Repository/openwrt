@@ -1,0 +1,5 @@
+#!/bin/sh
+
+/etc/init.d/luci-zerotier enabled && /etc/init.d/luci-zerotier restart
+
+exit 0

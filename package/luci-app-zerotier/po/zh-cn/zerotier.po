@@ -1,0 +1,50 @@
+msgid "Zerotier is an open source, cross-platform and easy to use virtual LAN"
+msgstr "Zerotier 是一个开源，跨平台，而且适合内网穿透互联的傻瓜配置虚拟 VPN LAN"
+
+msgid "Auto NAT Clients"
+msgstr "自动允许客户端 NAT"
+
+msgid "Allow zerotier clients access your LAN network"
+msgstr "允许 Zerotier 的拨入客户端访问路由器 LAN 资源（需要在 Zerotier 管理页面设定到 LAN 网段的路由表）"
+
+msgid "Create or manage your zerotier network, and auth clients who could access"
+msgstr "点击跳转到 Zerotier 官网管理平台，新建或者管理网络，并允许客户端接入访问你私人网路（新接入的节点默认不允许访问）"
+
+msgid "Base Setting"
+msgstr "基本设置"
+
+msgid "Interface Info"
+msgstr "接口信息"
+
+msgid "General options"
+msgstr "常规设置"
+
+msgid "Advanced options"
+msgstr "高级设置"
+
+msgid "Port of zerotier service, default 9993"
+msgstr "ZeroTier 运行端口，默认是 9993"
+
+msgid "Secret"
+msgstr "节点密钥"
+
+msgid "Secret of zerotier client"
+msgstr "密钥对应节点ID，留空会自动创建，谨慎修改"
+
+msgid "Configuration folder"
+msgstr "运行配置目录"
+
+msgid "Persistent configuration folder (for ZT controller mode)"
+msgstr "持久化运行配置目录（一般用于控制器模式），默认为空"
+
+msgid "Copy configuration folder"
+msgstr "运行配置目录保护"
+
+msgid "Copy configuration folder to RAM to prevent writing to flash (for ZT controller mode)"
+msgstr "使用拷贝而不是链接，来保护原目录内容（一般用于预先配置的控制器模式）"
+
+msgid "Local configuration"
+msgstr "本地配置文件"
+
+msgid "Path to the local.conf"
+msgstr "配置文件将映射到运行配置目录下的 local.conf，默认为空"

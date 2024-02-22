@@ -8,7 +8,7 @@
 		/etc/init.d/cron restart
 	fi
 
-sleep 3
+sleep 2
 
 if ! grep -q "watchdog" /etc/crontabs/root; then
 
