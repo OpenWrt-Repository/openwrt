@@ -9,8 +9,33 @@
 'require tools.widgets as widgets';
 
 /*
-	Copyright 2022-2023 Rafał Wabik - IceG - From eko.one.pl forum
+	Copyright 2022-2024 Rafał Wabik - IceG - From eko.one.pl forum
 */
+
+var CBISelectswitch = form.DummyValue.extend({                                                                                         
+    renderWidget: function(section_id, option_id, cfgvalue) {                                                                          
+        var section = this.section;                                                                                                    
+        return E([], [                                                                                                                 
+            E('span', { 'class': 'control-group' }, [                                                                                  
+                E('button', {                                                                                                          
+                    'class': 'cbi-button cbi-button-apply',                                                                            
+                    'click': ui.createHandlerFn(this, function() {                                                                     
+                        var dropdown = section.getUIElement(section_id, 'set_5gnsabands');                                              
+                        dropdown.setValue([]);                                                                                         
+                    }),                                                                                                                
+                }, _('Deselect all')),                                                                                                 
+                ' ',                                                                                                                   
+                E('button', {                                                                                                          
+                    'class': 'cbi-button cbi-button-action important',                                                                 
+                    'click': ui.createHandlerFn(this, function() {                                                                     
+                        var dropdown = section.getUIElement(section_id, 'set_5gnsabands');                                              
+                        dropdown.setValue(Object.keys(dropdown.choices));                                                              
+                    })                                                                                                                 
+                }, _('Select all'))                                                                                                    
+            ])                                                                                                                         
+        ]);                                                                                                                            
+    },                                                                                                                                 
+});
 
 var BANDmagic = form.DummyValue.extend({
 
@@ -119,6 +144,9 @@ var cbiRichListValue = form.ListValue.extend({
 			id: this.cbid(section_id),
 			sort: this.keylist,
 			optional: true,
+			multiple: true,
+			display_items: 5,
+			dropdown_items: 10,
 			select_placeholder: this.select_placeholder || this.placeholder,
 			custom_placeholder: this.custom_placeholder || this.placeholder,
 			validate: L.bind(this.validate, this, section_id),
@@ -220,7 +248,8 @@ return view.extend({
 				modemen += 'n' + numb + '  ';
 				modemen = modemen.replace('undefined', '');
 		}
-		modemen = modemen.trim();
+		modemen = modemen.includes('n0') == true ? modemen = _('Bands are disabled...') : modemen.trim();
+
 
 		for (var i = 0; i < json.supported5gnsa.length; i++) 
 		{
@@ -230,6 +259,7 @@ return view.extend({
 				sbands = sbands.replace('undefined', '');
 		}
 		sbands = sbands.trim();
+		
 		
 		pollData: poll.add(function() {
 			return L.resolveDefault(fs.exec_direct('/usr/bin/modemband.sh', [ 'json' ]))
@@ -248,7 +278,7 @@ return view.extend({
 				view.innerHTML  = '';
   				view.innerHTML  = renderHTML.trim();
 				}
-
+				view.innerHTML = view.innerHTML.includes('n0') == true ? view.innerHTML = _('Bands are disabled...') : view.innerHTML  = renderHTML.trim();
 				}
 				else {
 				var view = document.getElementById("modemlteb");
@@ -331,6 +361,8 @@ return view.extend({
 		o.cfgvalue = function(section_id) {
 			return L.toArray((json.enabled5gnsa).join(' '));
 		};
+		
+		o = s.taboption('bandset', CBISelectswitch, '_switch', _('Band selection switch'));
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;

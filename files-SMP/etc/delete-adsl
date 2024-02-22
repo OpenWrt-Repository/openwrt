@@ -1,0 +1,25 @@
+#!/bin/bash
+opkg remove dsl-vrx200-firmware-xdsl-a dsl-vrx200-firmware-xdsl-a-patch \
+dsl-vrx200-firmware-xdsl-b dsl-vrx200-firmware-xdsl-b-patch \
+kmod-ltq-vdsl-vr9  ltq-vdsl-app ltq-vdsl-mei_test \
+ltq-vdsl-vr9-vectoring-fw-installer atm-esi kmod-atm kmod-ltq-atm-vr9 \
+kmod-ltq-ptm-vr9 linux-atm br2684ctl kmod-pppoa ppp-mod-pppoa kmod-atmtcp \
+atm-diagnostics kmod-ltq-vdsl-vr9-mei --force-depends
+sed -i 's|pppoe-wan|eth0.2|g' /etc/lcd4linux.conf
+sed -i 's|pppoe-wan|eth0.2|g' /etc/lcd4linux.conf.black
+sed -i 's|pppoe-wan|eth0.2|g' /etc/lcd4linux.conf.white
+sed -i 's|pppoe-wan|eth0.2|g' /etc/speed
+sed -i 's|dsl0.35|eth0.2|g' /etc/config/network
+sed -i 's|dsl0|eth0.2|g' /etc/config/network
+sed -i 's|pppoe|dhcp|g' /etc/config/network
+uci del network.wan.username
+uci del network.wan.password
+#uci del network.wan.ipv6
+#uci set network.wan.proto='dhcp'
+#uci set network.wan.device='eth0.2'
+#uci set network.wan.ifname='eth0.2'
+#uci set network.@device[2].name='eth0.2'
+uci commit network
+echo Warning! 
+echo 'Router reboot... Please wait about 3 minutes and try again log in.' && reboot 
+exit 0

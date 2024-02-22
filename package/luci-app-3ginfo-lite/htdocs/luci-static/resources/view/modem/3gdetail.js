@@ -10,7 +10,7 @@
 'require tools.widgets as widgets';
 
 /*
-	Copyright 2021-2023 Rafał Wabik - IceG - From eko.one.pl forum
+	Copyright 2021-2024 Rafał Wabik - IceG - From eko.one.pl forum
 	
 	Licensed to the GNU General Public License v3.0.
 	
@@ -290,8 +290,8 @@ modemDialog: baseclass.extend({
 
 				window.setTimeout(function() {
 					if (!poll.active()) poll.start();
-					//location.reload();
-					ev.target.blur();
+					location.reload();
+					//ev.target.blur();
 				}, 2000).finally();
 			});
 
@@ -457,6 +457,21 @@ modemDialog: baseclass.extend({
 						}
 						else {
 						view.textContent = json.operator_name;
+						}
+						}
+					}
+
+					if (document.getElementById('location')) {
+						var view = document.getElementById("location");
+						if (json.signal == 0 || json.signal == '') {
+						view.textContent = '-';
+						}
+						else {
+						if (json.location == '') { 
+						view.textContent = '-';
+						}
+						else {
+						view.innerHTML = json.location;
 						}
 						}
 					}
@@ -678,20 +693,20 @@ modemDialog: baseclass.extend({
 
 					if (document.getElementById('lac')) {
 						var view = document.getElementById("lac");
-						
-						if (json.lac_dec == 0 || json.lac_hex == 0) {
-						view.textContent = '-';
-						}
-						
-						if (json.lac_dec == '' || json.lac_hex == '') { 
-						var lc = json.lac_dec   + ' ' + json.lac_hex;
-						var ld = lc.split(' ').join('');
-						view.textContent = ld;
+						var viewn = document.getElementById("lacn");
+						if (json.lac_dec.length < 2 || json.lac_hex.length < 2) { 
+						viewn.style.display = "none";
 						}
 						else {
-						view.innerHTML = json.lac_dec + ' (' + json.lac_hex + ')';
+							if (json.lac_dec == '' || json.lac_hex == '') { 
+							var lc = json.lac_dec   + ' ' + json.lac_hex;
+							var ld = lc.split(' ').join('');
+							view.textContent = ld;
+							}
+							else {
+							view.innerHTML = json.lac_dec + ' (' + json.lac_hex + ')';
+							}
 						}
-
 					}
 
 					if (document.getElementById('tac')) {
@@ -847,8 +862,13 @@ modemDialog: baseclass.extend({
 					]),
 				E('tr', { 'class': 'tr' }, [
 					E('td', { 'class': 'td left', 'width': '33%' }, [ _('Operator')]),
-					E('td', { 'class': 'td left', 'id': 'operator' }, [ '-' ]),
+					E('td', { 'class': 'td left' }, [
+						E('div', { 'class': 'right' }, [
+							E('div', { 'style': 'text-align:left;font-size:100%', 'id': 'operator' }, [ '-' ]),
+							E('div', { 'style': 'text-align:left;font-size:66%', 'id': 'location' }, [ '-' ]),
+						]),
 					]),
+				]),
 				E('tr', { 'class': 'tr' }, [
 					E('td', { 'class': 'td left', 'width': '33%' }, [ _('SIM status')]),
 					E('td', { 'class': 'td left'}, [
@@ -919,7 +939,7 @@ modemDialog: baseclass.extend({
 					E('td', { 'class': 'td left', 'width': '33%' }, [ _('TAC')]),
 					E('td', { 'class': 'td left', 'id': 'tac' }, [ '-' ]),
 					]),
-				E('tr', { 'class': 'tr' }, [
+				E('tr', { 'id': 'lacn', 'class': 'tr' }, [
 					E('td', { 'class': 'td left', 'width': '33%' }, [ _('LAC')]),
 					E('td', { 'class': 'td left', 'id': 'lac' }, [ '-' ]),
 					]),

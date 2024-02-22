@@ -1,4 +1,3 @@
-
 ## Port on Easybox 904x switch1 ETH-0 - ETH-3: [DSL+WAN][ISDN][ISDN][ETH-0][ETH-1][ETH-2][ETH-3] (Power)
 #Lantiq switch0
 #port 0 ---Lan1----------------------- rtl8367 switch1
@@ -6,47 +5,60 @@
 #port 5 ---Lan3-Vlan66-Vlan71--- WLAN WiSoC rt3883
 
 config interface 'loopback'
-	option ifname 'lo'
+	option device 'lo'
 	option proto 'static'
 	option ipaddr '127.0.0.1'
 	option netmask '255.0.0.0'
-	option ipv6 '1'
 
 config globals 'globals'
 	option packet_steering '1'
 
+config atm-bridge 'atm'
+	option encaps 'llc'
+	option payload 'bridged'
+	option nameprefix 'dsl'
+	option vci '35'
+	option vpi '8'
+
+config dsl 'dsl'
+	option tone 'av'
+	option annex 'b'
+	option xfer_mode 'ptm'
+	option line_mode 'vdsl'
+	option ds_snr_offset '0'
+
 config device
-	option name 'eth0'
-	option macaddr '9C:80:DF:63:F9:D0'
-	option ipv6 '1'
+	option name 'br-lan'
+	option type 'bridge'
+	option ports 'eth0.1 eth0.66'
+	option macaddr '00:11:22:33:44:01'
+
+config device
+	option name 'eth0.1'
+	option macaddr '18:83:bf:2a:85:7e'
 
 config interface 'lan'
-	option type 'bridge'
+	option device 'br-lan'
 	option proto 'static'
 	option ipaddr '192.168.1.1'
 	option netmask '255.255.255.0'
 	option ipv6 '1'
-	list ports 'eth0.1'
-	list ports 'eth0.66'
+	option stp '1'
 	option force_link '0'
 
-config device 'lan_eth0_1_dev'
-	option name 'eth0.1'
-	option macaddr '9c:80:df:63:f9:de'
-	option ipv6 '1'
+config device
+	option macaddr '18:83:bf:2a:85:7f'
+	option name 'eth0.2'
 
-# WAN as eth0.2
 config interface 'wan'
-	option ifname 'eth0.2'
-	option proto 'dhcp'
 	option ipv6 '1'
 	option metric '20'
+	option username 'user@dialnet.pl'
+	option password 'passwd'
+	option ifname 'dsl0.35'
 	option auto '1'
-
-config device 'wan_dev'
-	option name 'eth0.2'
-	option macaddr '9c:80:df:63:f9:22'
-	option ipv6 '1'
+	option device 'eth0.2'
+	option proto 'dhcp'
 
 config interface 'wan6'
 	option device '@wan'
@@ -60,8 +72,6 @@ config switch
 config switch_vlan
 	option device 'switch0'
 	option vlan '1'
-	option vid '1'
-	option fid '1'
 	option ports '0 6t'
 
 config switch_vlan
@@ -79,63 +89,20 @@ config switch_vlan
 	option vlan '1'
 	option ports '0 1 2 3 6t'
 
-config device 'inic_dev'
-	option name 'eth0.3'
-
-config interface 'inic'
-	option proto 'none'
-	option ifname 'eth0.3'
-	option ipv6 '0'
-
-config switch_vlan
-	option device 'switch0'
-	option vlan '3'
-	option vid '3'
-	option fid '3'
-	option ports '5 6t'
-
-config device 'wlan_dev'
-	option name 'eth0.66'
-	option macaddr '9c:80:df:63:f9:d1'
-	option ipv6 '0'
-
-config switch_vlan
-	option device 'switch0'
-	option vlan '4'
-	option vid '66'
-	option fid '4'
-	option ports '5t 6t'
-
-config device 'guest_wlan_dev'
-	option name 'eth0.71'
-	option macaddr '9c:80:df:63:f9:d2'
-
-config switch_vlan
-	option device 'switch0'
-	option vlan '5'
-	option vid '71'
-	option fid '5'
-	option ports '5t 6t'
-
 config interface 'hilink'
 	option proto 'dhcp'
 	option ipv6 '0'
 	option metric '10'
-	option ifname 'eth1'
 	option delegate '0'
 	option auto '1'
-
-config interface 'upcwifree'
-	option proto 'dhcp'
-	option ipv6 '0'
-	option auto '1'
+	option device 'eth1'
 
 config interface 'wwan'
 	option proto 'dhcp'
-	option ifname 'usb0'
-	option ipv6 '1'
+	option ipv6 '0'
 	option auto '1'
 	option metric '10'
+	option device 'usb0'
 
 config interface 'umts'
 	option proto '3g'
@@ -143,14 +110,14 @@ config interface 'umts'
 	option service 'umts'
 	option apn 'internet'
 	option dialnumber '*99***1#'
-	option ipv6 '1'
+	option ipv6 '0'
 	option auto '1'
 	option metric '10'
 
 config interface 'PPTP'
 	option proto 'pptp'
 	option keepalive '0'
-	option ipv6 '1'
+	option ipv6 '0'
 	option auto '0'
 	option server 'pl02.vpnonline.eu'
 	option username 'twoj login'
@@ -158,37 +125,11 @@ config interface 'PPTP'
 	option metric '10'
 
 config interface 'TUN'
-	option ifname 'tun0'
 	option proto 'none'
 	option delegate '0'
 	option auto '1'
 	option metric '10'
-
-config interface 'wg0'
-	option proto 'wireguard'
-	option listen_port '55055'
-	list addresses '10.9.0.1/24'
-	option private_key 'aNcfPPirZGQrgFDHw07dgRqoSnP/Kni45ITneZlFFng='
-	option ipv6 '0'
-	option auto '0'
-
-config wireguard_wg0
-	option public_key 'Axn5g0cb0eYEc8utzM/2FXZ0vSdIE8AwxmUGfQBwzEY='
-	option route_allowed_ips '1'
-	list allowed_ips '10.9.0.3/32'
-	option persistent_keepalive '25'
-	option description 'android'
-	option ipv6 '0'
-	option auto '0'
-
-config interface 'ipsec'
-	option ifname 'ipsec0'
-	option proto 'none'
-	option defaultroute '0'
-	option peerdns '0'
-	option ipv6 '0'
-	option auto '0'
-	option metric '10'
+	option device 'tun0'
 
 config interface 'NCM'
 	option proto 'ncm'
@@ -200,4 +141,41 @@ config interface 'NCM'
 	option ipv6 '0'
 	option auto '0'
 	option metric '10'
+
+config device 'inic_dev'
+	option name 'eth0.3'
+	option macaddr '00:11:22:33:44:33'
+
+config interface 'inic'
+	option proto 'none'
+	option ifname 'eth0.3'
+
+config switch_vlan
+	option device 'switch0'
+	option vlan '3'
+	option vid '3'
+	option fid '3'
+	option ports '5 6t'
+
+config device 'wlan_dev'
+	option name 'eth0.66'
+	option macaddr '00:11:22:33:44:66'
+
+config switch_vlan
+	option device 'switch0'
+	option vlan '4'
+	option vid '66'
+	option fid '4'
+	option ports '5t 6t'
+
+config device 'guest_wlan_dev'
+	option name 'eth0.71'
+	option macaddr '00:11:22:33:44:71'
+
+config switch_vlan
+	option device 'switch0'
+	option vlan '5'
+	option vid '71'
+	option fid '5'
+	option ports '5t 6t'
 

@@ -1,0 +1,11 @@
+# PPP options for the PPPoE server
+# LIC: GPL
+ms-dns 8.8.8.8
+debug
+login
+lcp-echo-interval 10
+lcp-echo-failure 2
+require-chap
+ktune
+mru 1492
+mtu 1492

@@ -103,6 +103,10 @@ config command
 	option command 'ifdown hilink && ifup wan'
 
 config command
+	option name 'switch to WAN-eth0.2'
+	option command '/etc/delete-adsl'
+
+config command
 	option name 'version OpenWrt'
 	option command '/etc/version-openwrt'
 
