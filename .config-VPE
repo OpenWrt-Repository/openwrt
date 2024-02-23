@@ -5718,6 +5718,7 @@ CONFIG_PACKAGE_luci-app-sms-tool-js=m
 CONFIG_PACKAGE_luci-app-throughput-measurements=m
 CONFIG_PACKAGE_luci-app-timecontrol=y
 # CONFIG_PACKAGE_luci-app-tinyproxy is not set
+CONFIG_PACKAGE_luci-app-tor=m
 # CONFIG_PACKAGE_luci-app-transmission is not set
 # CONFIG_PACKAGE_luci-app-travelmate is not set
 CONFIG_PACKAGE_luci-app-ttyd=y
@@ -6285,6 +6286,7 @@ CONFIG_PACKAGE_luci-i18n-sms-tool-js-pl=m
 CONFIG_PACKAGE_luci-i18n-sms-tool-pl=y
 CONFIG_PACKAGE_luci-i18n-sms-tool-ru=m
 CONFIG_PACKAGE_luci-i18n-timecontrol-pl=y
+CONFIG_PACKAGE_luci-i18n-tor-ru=m
 # CONFIG_PACKAGE_luci-i18n-ttyd-ar is not set
 # CONFIG_PACKAGE_luci-i18n-ttyd-bg is not set
 # CONFIG_PACKAGE_luci-i18n-ttyd-bn is not set
