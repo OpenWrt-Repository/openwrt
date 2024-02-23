@@ -34,7 +34,6 @@ subversion libz-dev libc-dev rsync which
 
 * [Firmware Recovery with GUI](https://github.com/zuzia-dev/Easybox-904xDSL)
 * [Repository of compiled images and packages](https://github.com/zuzia-dev/Easybox-904xDSL-repo-source)
-* [Full source with feeds](https://github.com/zuzia-dev/Easybox-904xDSL-repo-source/raw/main/Source/Easybox-904xDSL-full-source-openwrt-21.02-v2.zip): Zip file, 523 MB.
 * [The official OpenWrt forum](https://forum.openwrt.org/t/lantiq-xrx200-easybox-904xdsl-and-speedport-w-921v-build/77105)
 
 ## License
